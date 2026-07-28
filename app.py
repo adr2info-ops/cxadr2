@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import sqlite3
 import os
+from datetime import datetime
 
 app = FastAPI(title="Caixa Diário")
 
@@ -131,7 +132,26 @@ def salvar_caixa(dados: MovimentacaoSchema):
     conn.close()
     return {"status": "sucesso", "total_geral": total_geral}
 
-# Rota para Relatório Consolidado por Período
+# Rota para buscar o acumulado do Mês
+@app.get("/api/mensal/{data_caixa}")
+def buscar_acumulado_mensal(data_caixa: str):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    # Extrai Ano e Mês (YYYY-MM)
+    ano_mes = data_caixa[:7]
+    
+    cursor.execute("""
+        SELECT SUM(total_geral)
+        FROM caixa 
+        WHERE data_caixa LIKE ?
+    """, (f"{ano_mes}%",))
+    
+    total_mes = cursor.fetchone()[0]
+    conn.close()
+    
+    return {"ano_mes": ano_mes, "total_mes": total_mes or 0.0}
+
 @app.get("/api/relatorio")
 def gerar_relatorio(inicio: str, fim: str):
     conn = sqlite3.connect(DB_NAME)
@@ -156,12 +176,10 @@ def gerar_relatorio(inicio: str, fim: str):
     
     r = dict(row)
     
-    # Soma de cada programa
     total_clipp = (r["clipp_np"] or 0) + (r["clipp_pix"] or 0) + (r["clipp_especie"] or 0) + (r["clipp_cartao"] or 0)
     total_os = (r["os_np"] or 0) + (r["os_pix"] or 0) + (r["os_especie"] or 0) + (r["os_cartao"] or 0)
     total_sh = (r["sh_np"] or 0) + (r["sh_pix"] or 0) + (r["sh_especie"] or 0) + (r["sh_cartao"] or 0)
     
-    # Soma por meio de pagamento
     tot_np = (r["clipp_np"] or 0) + (r["os_np"] or 0) + (r["sh_np"] or 0)
     tot_pix = (r["clipp_pix"] or 0) + (r["os_pix"] or 0) + (r["sh_pix"] or 0)
     tot_especie = (r["clipp_especie"] or 0) + (r["os_especie"] or 0) + (r["sh_especie"] or 0)
