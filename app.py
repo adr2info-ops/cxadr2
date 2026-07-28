@@ -7,7 +7,6 @@ import os
 
 app = FastAPI(title="Caixa Diário")
 
-# Permite acesso na rede local
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,7 +17,6 @@ app.add_middleware(
 
 DB_NAME = "caixa_diario.db"
 
-# Inicializa o Banco de Dados SQLite
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -51,7 +49,6 @@ def init_db():
 
 init_db()
 
-# Modelo de validação de dados
 class MovimentacaoSchema(BaseModel):
     data_caixa: str
     
@@ -75,8 +72,27 @@ def carregar_pagina():
     if os.path.exists("index.html"):
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
-    return "<h1>Arquivo index.html não encontrado na pasta C:\\CXADR2!</h1>"
+    return "<h1>Arquivo index.html não encontrado!</h1>"
 
+# Rota para Buscar Lançamentos por Data
+@app.get("/api/caixa/{data_caixa}")
+def buscar_caixa(data_caixa: str):
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM caixa WHERE data_caixa = ?", (data_caixa,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    if not row:
+        return {"encontrado": False}
+    
+    resultado = dict(row)
+    resultado["encontrado"] = True
+    return resultado
+
+# Rota para Salvar / Atualizar Caixa
 @app.post("/api/caixa")
 def salvar_caixa(dados: MovimentacaoSchema):
     total_clipp = dados.clipp_np + dados.clipp_pix + dados.clipp_especie + dados.clipp_cartao
