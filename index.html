@@ -19,31 +19,25 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; }
 
-        /* Header Fixo */
         header { background: var(--primary); color: white; padding: 12px 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
         header h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.5px; }
 
-        /* Container ajustado para telas mobile */
         .container { max-width: 420px; margin: 0 auto; padding: 10px; }
 
-        /* Card da Data */
         .card-date { background: var(--card-bg); padding: 10px 14px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .card-date label { font-weight: 700; font-size: 0.8rem; color: var(--subtext); }
         .card-date input { border: 1px solid var(--border); background: #f1f5f9; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; color: var(--text); outline: none; }
 
-        /* Cards dos Programas */
         .card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
         .card-title { font-size: 0.88rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; }
         .card-title span.subtotal-badge { background: #eff6ff; color: var(--primary-light); font-size: 0.8rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
 
-        /* Grid compacto com 2 colunas */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .field { display: flex; flex-direction: column; }
         .field label { font-size: 0.7rem; font-weight: 700; color: var(--subtext); margin-bottom: 3px; text-transform: uppercase; }
         .field input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); background: #f8fafc; border-radius: 6px; font-size: 0.95rem; font-weight: 700; text-align: right; color: var(--text); outline: none; -webkit-appearance: none; }
         .field input:focus { border-color: var(--primary-light); background: #fff; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
 
-        /* Resumo das Formas de Pagamento */
         .summary-card { background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
         .summary-title { font-size: 0.75rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; margin-bottom: 6px; text-align: center; }
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; text-align: center; }
@@ -51,7 +45,6 @@
         .summary-item label { font-size: 0.65rem; color: var(--subtext); font-weight: 700; display: block; }
         .summary-item span { font-size: 0.85rem; font-weight: 700; color: var(--text); }
 
-        /* Total Geral e Botão Fixo no Rodapé */
         .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid var(--border); padding: 10px 14px; box-shadow: 0 -3px 10px rgba(0,0,0,0.08); z-index: 100; }
         .footer-container { max-width: 420px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         
@@ -73,7 +66,7 @@
         <!-- Data -->
         <div class="card-date">
             <label for="data_caixa">DATA DO CAIXA</label>
-            <input type="date" id="data_caixa">
+            <input type="date" id="data_caixa" onchange="carregarData()">
         </div>
 
         <!-- CLIPP -->
@@ -142,10 +135,21 @@
     </div>
 
 <script>
+    const campos = [
+        'clipp_np', 'clipp_pix', 'clipp_especie', 'clipp_cartao',
+        'os_np', 'os_pix', 'os_especie', 'os_cartao',
+        'sh_np', 'sh_pix', 'sh_especie', 'sh_cartao'
+    ];
+
     document.getElementById('data_caixa').valueAsDate = new Date();
+    carregarData();
 
     function getVal(id) {
         return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function setVal(id, val) {
+        document.getElementById(id).value = val > 0 ? val : '';
     }
 
     function fmt(valor) {
@@ -175,6 +179,33 @@
         document.getElementById('total_geral').innerText = fmt(total);
     }
 
+    async function carregarData() {
+        const dataSel = document.getElementById('data_caixa').value;
+        if (!dataSel) return;
+
+        try {
+            const response = await fetch(`/api/caixa/${dataSel}`);
+            const data = await response.json();
+
+            if (data.encontrado) {
+                setVal('clipp_np', data.clipp_np); setVal('clipp_pix', data.clipp_pix);
+                setVal('clipp_especie', data.clipp_especie); setVal('clipp_cartao', data.clipp_cartao);
+
+                setVal('os_np', data.osrecargas_np); setVal('os_pix', data.osrecargas_pix);
+                setVal('os_especie', data.osrecargas_especie); setVal('os_cartao', data.osrecargas_cartao);
+
+                setVal('sh_np', data.shoficina_np); setVal('sh_pix', data.shoficina_pix);
+                setVal('sh_especie', data.shoficina_especie); setVal('sh_cartao', data.shoficina_cartao);
+            } else {
+                // Se o dia não existe no banco, zera todos os campos
+                campos.forEach(id => document.getElementById(id).value = '');
+            }
+            calcular();
+        } catch (e) {
+            console.error('Erro ao carregar dados da data:', e);
+        }
+    }
+
     async function salvarData() {
         const payload = {
             data_caixa: document.getElementById('data_caixa').value,
@@ -193,7 +224,7 @@
             if (response.ok) {
                 alert('✅ Caixa salvo com sucesso!');
             } else {
-                alert('❌ Erro ao salvar o caixa. Tente novamente.');
+                alert('❌ Erro ao salvar o caixa.');
             }
         } catch (e) {
             alert('⚠️ Erro de conexão com o servidor.');
