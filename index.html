@@ -24,9 +24,13 @@
 
         .container { max-width: 420px; margin: 0 auto; padding: 10px; }
 
-        .card-date { background: var(--card-bg); padding: 10px 14px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .card-date label { font-weight: 700; font-size: 0.8rem; color: var(--subtext); }
-        .card-date input { border: 1px solid var(--border); background: #f1f5f9; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; color: var(--text); outline: none; }
+        /* Controles de Data */
+        .card-date { background: var(--card-bg); padding: 8px 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+        .card-date label { font-weight: 700; font-size: 0.75rem; color: var(--subtext); }
+        .date-controls { display: flex; align-items: center; gap: 4px; }
+        .card-date input { border: 1px solid var(--border); background: #f1f5f9; padding: 6px 8px; border-radius: 6px; font-size: 0.88rem; font-weight: 600; color: var(--text); outline: none; }
+        .btn-nav { background: var(--primary-light); color: white; border: none; width: 32px; height: 32px; border-radius: 6px; font-size: 1.1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-nav:active { opacity: 0.8; }
 
         .card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
         .card-title { font-size: 0.88rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; }
@@ -45,15 +49,31 @@
         .summary-item label { font-size: 0.65rem; color: var(--subtext); font-weight: 700; display: block; }
         .summary-item span { font-size: 0.85rem; font-weight: 700; color: var(--text); }
 
+        /* Rodapé com 2 Botões */
         .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid var(--border); padding: 10px 14px; box-shadow: 0 -3px 10px rgba(0,0,0,0.08); z-index: 100; }
-        .footer-container { max-width: 420px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .footer-container { max-width: 420px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
         
         .total-display { display: flex; flex-direction: column; }
         .total-display label { font-size: 0.65rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
-        .total-display span { font-size: 1.2rem; font-weight: 800; color: var(--success); }
+        .total-display span { font-size: 1.1rem; font-weight: 800; color: var(--success); }
 
-        .btn-salvar { background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.2s; -webkit-tap-highlight-color: transparent; }
-        .btn-salvar:active { background: #15803d; }
+        .btn-group { display: flex; gap: 6px; }
+        .btn-relatorio { background: var(--primary); color: white; border: none; padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+        .btn-salvar { background: var(--success); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+        .btn-salvar:active, .btn-relatorio:active { opacity: 0.8; }
+
+        /* Modal do Relatório */
+        .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 15px; }
+        .modal-content { background: white; padding: 16px; border-radius: 12px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .modal-grid label { font-size: 0.7rem; font-weight: 700; color: var(--subtext); }
+        .modal-grid input { width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; }
+        .btn-buscar { width: 100%; background: var(--primary-light); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; margin-bottom: 12px; cursor: pointer; }
+        .btn-fechar { width: 100%; background: #e2e8f0; color: #334155; border: none; padding: 8px; border-radius: 8px; font-weight: 700; margin-top: 10px; cursor: pointer; }
+        .relatorio-resumo { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; }
+        .relatorio-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; }
+        .relatorio-total { border-top: 2px solid var(--border); padding-top: 6px; margin-top: 6px; font-size: 0.95rem; font-weight: 800; color: var(--success); }
     </style>
 </head>
 <body>
@@ -63,10 +83,14 @@
     </header>
 
     <div class="container">
-        <!-- Data -->
+        <!-- Data com Botões de Navegação -->
         <div class="card-date">
             <label for="data_caixa">DATA DO CAIXA</label>
-            <input type="date" id="data_caixa" onchange="carregarData()">
+            <div class="date-controls">
+                <button class="btn-nav" onclick="alterarDia(-1)">‹</button>
+                <input type="date" id="data_caixa" onchange="carregarData()">
+                <button class="btn-nav" onclick="alterarDia(1)">›</button>
+            </div>
         </div>
 
         <!-- CLIPP -->
@@ -127,10 +151,47 @@
     <div class="footer-action">
         <div class="footer-container">
             <div class="total-display">
-                <label>TOTAL GERAL DO DIA</label>
+                <label>TOTAL GERAL</label>
                 <span id="total_geral">R$ 0,00</span>
             </div>
-            <button class="btn-salvar" onclick="salvarData()">SALVAR CAIXA</button>
+            <div class="btn-group">
+                <button class="btn-relatorio" onclick="abrirModalRelatorio()">RELATÓRIO</button>
+                <button class="btn-salvar" onclick="salvarData()">SALVAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE RELATÓRIO -->
+    <div class="modal" id="modalRelatorio">
+        <div class="modal-content">
+            <div class="modal-title">Relatório por Período</div>
+            
+            <div class="modal-grid">
+                <div>
+                    <label>DATA INICIAL</label>
+                    <input type="date" id="rel_inicio">
+                </div>
+                <div>
+                    <label>DATA FINAL</label>
+                    <input type="date" id="rel_fim">
+                </div>
+            </div>
+
+            <button class="btn-buscar" onclick="gerarRelatorio()">GERAR RELATÓRIO</button>
+
+            <div class="relatorio-resumo" id="resultadoRelatorio" style="display:none;">
+                <div class="relatorio-row"><span>SOMA CLIPP:</span><span id="r_clipp">R$ 0,00</span></div>
+                <div class="relatorio-row"><span>SOMA OSRECARGAS:</span><span id="r_os">R$ 0,00</span></div>
+                <div class="relatorio-row"><span>SOMA SHOFICINA:</span><span id="r_sh">R$ 0,00</span></div>
+                <hr style="margin: 6px 0; border:0; border-top:1px dashed #ccc;">
+                <div class="relatorio-row"><span>NP:</span><span id="r_np">R$ 0,00</span></div>
+                <div class="relatorio-row"><span>PIX:</span><span id="r_pix">R$ 0,00</span></div>
+                <div class="relatorio-row"><span>ESPÉCIE:</span><span id="r_especie">R$ 0,00</span></div>
+                <div class="relatorio-row"><span>CARTÃO:</span><span id="r_cartao">R$ 0,00</span></div>
+                <div class="relatorio-row relatorio-total"><span>TOTAL NO PERÍODO:</span><span id="r_total">R$ 0,00</span></div>
+            </div>
+
+            <button class="btn-fechar" onclick="fecharModalRelatorio()">FECHAR</button>
         </div>
     </div>
 
@@ -144,6 +205,22 @@
     document.getElementById('data_caixa').valueAsDate = new Date();
     carregarData();
 
+    function alterarDia(dias) {
+        const inputData = document.getElementById('data_caixa');
+        if (!inputData.value) return;
+
+        const partes = inputData.value.split('-');
+        const dataAtual = new Date(partes[0], partes[1] - 1, partes[2]);
+        dataAtual.setDate(dataAtual.getDate() + dias);
+
+        const ano = dataAtual.getFullYear();
+        const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
+        const dia = String(dataAtual.getDate()).padStart(2, '0');
+
+        inputData.value = `${ano}-${mes}-${dia}`;
+        carregarData();
+    }
+
     function getVal(id) {
         return parseFloat(document.getElementById(id).value) || 0;
     }
@@ -153,7 +230,7 @@
     }
 
     function fmt(valor) {
-        return `R$ ${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `R$ ${(valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
     function calcular() {
@@ -197,12 +274,11 @@
                 setVal('sh_np', data.shoficina_np); setVal('sh_pix', data.shoficina_pix);
                 setVal('sh_especie', data.shoficina_especie); setVal('sh_cartao', data.shoficina_cartao);
             } else {
-                // Se o dia não existe no banco, zera todos os campos
                 campos.forEach(id => document.getElementById(id).value = '');
             }
             calcular();
         } catch (e) {
-            console.error('Erro ao carregar dados da data:', e);
+            console.error('Erro ao carregar data:', e);
         }
     }
 
@@ -228,6 +304,53 @@
             }
         } catch (e) {
             alert('⚠️ Erro de conexão com o servidor.');
+        }
+    }
+
+    // Funções do Modal de Relatório
+    function abrirModalRelatorio() {
+        document.getElementById('modalRelatorio').style.display = 'flex';
+        document.getElementById('rel_inicio').value = document.getElementById('data_caixa').value;
+        document.getElementById('rel_fim').value = document.getElementById('data_caixa').value;
+    }
+
+    function fecharModalRelatorio() {
+        document.getElementById('modalRelatorio').style.display = 'none';
+    }
+
+    async function gerarRelatorio() {
+        const inicio = document.getElementById('rel_inicio').value;
+        const fim = document.getElementById('rel_fim').value;
+
+        if (!inicio || !fim) {
+            alert('Por favor, selecione a data inicial e final.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/relatorio?inicio=${inicio}&fim=${fim}`);
+            const data = await response.json();
+
+            const box = document.getElementById('resultadoRelatorio');
+            box.style.display = 'block';
+
+            if (data.tem_dados) {
+                document.getElementById('r_clipp').innerText = fmt(data.total_clipp);
+                document.getElementById('r_os').innerText = fmt(data.total_os);
+                document.getElementById('r_sh').innerText = fmt(data.total_sh);
+                
+                document.getElementById('r_np').innerText = fmt(data.tot_np);
+                document.getElementById('r_pix').innerText = fmt(data.tot_pix);
+                document.getElementById('r_especie').innerText = fmt(data.tot_especie);
+                document.getElementById('r_cartao').innerText = fmt(data.tot_cartao);
+
+                document.getElementById('r_total').innerText = fmt(data.total_periodo);
+            } else {
+                alert('Nenhum registro encontrado para este período.');
+                box.style.display = 'none';
+            }
+        } catch (e) {
+            alert('Erro ao buscar o relatório.');
         }
     }
 </script>
