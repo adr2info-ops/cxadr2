@@ -74,7 +74,6 @@ def carregar_pagina():
             return f.read()
     return "<h1>Arquivo index.html não encontrado!</h1>"
 
-# Rota para Buscar Lançamentos por Data
 @app.get("/api/caixa/{data_caixa}")
 def buscar_caixa(data_caixa: str):
     conn = sqlite3.connect(DB_NAME)
@@ -92,7 +91,6 @@ def buscar_caixa(data_caixa: str):
     resultado["encontrado"] = True
     return resultado
 
-# Rota para Salvar / Atualizar Caixa
 @app.post("/api/caixa")
 def salvar_caixa(dados: MovimentacaoSchema):
     total_clipp = dados.clipp_np + dados.clipp_pix + dados.clipp_especie + dados.clipp_cartao
@@ -132,3 +130,51 @@ def salvar_caixa(dados: MovimentacaoSchema):
     
     conn.close()
     return {"status": "sucesso", "total_geral": total_geral}
+
+# Rota para Relatório Consolidado por Período
+@app.get("/api/relatorio")
+def gerar_relatorio(inicio: str, fim: str):
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT 
+            SUM(clipp_np) as clipp_np, SUM(clipp_pix) as clipp_pix, SUM(clipp_especie) as clipp_especie, SUM(clipp_cartao) as clipp_cartao,
+            SUM(osrecargas_np) as os_np, SUM(osrecargas_pix) as os_pix, SUM(osrecargas_especie) as os_especie, SUM(osrecargas_cartao) as os_cartao,
+            SUM(shoficina_np) as sh_np, SUM(shoficina_pix) as sh_pix, SUM(shoficina_especie) as sh_especie, SUM(shoficina_cartao) as sh_cartao,
+            SUM(total_geral) as total_periodo
+        FROM caixa 
+        WHERE data_caixa BETWEEN ? AND ?
+    """, (inicio, fim))
+    
+    row = cursor.fetchone()
+    conn.close()
+    
+    if not row or row["total_periodo"] is None:
+        return {"tem_dados": False}
+    
+    r = dict(row)
+    
+    # Soma de cada programa
+    total_clipp = (r["clipp_np"] or 0) + (r["clipp_pix"] or 0) + (r["clipp_especie"] or 0) + (r["clipp_cartao"] or 0)
+    total_os = (r["os_np"] or 0) + (r["os_pix"] or 0) + (r["os_especie"] or 0) + (r["os_cartao"] or 0)
+    total_sh = (r["sh_np"] or 0) + (r["sh_pix"] or 0) + (r["sh_especie"] or 0) + (r["sh_cartao"] or 0)
+    
+    # Soma por meio de pagamento
+    tot_np = (r["clipp_np"] or 0) + (r["os_np"] or 0) + (r["sh_np"] or 0)
+    tot_pix = (r["clipp_pix"] or 0) + (r["os_pix"] or 0) + (r["sh_pix"] or 0)
+    tot_especie = (r["clipp_especie"] or 0) + (r["os_especie"] or 0) + (r["sh_especie"] or 0)
+    tot_cartao = (r["clipp_cartao"] or 0) + (r["os_cartao"] or 0) + (r["sh_cartao"] or 0)
+
+    return {
+        "tem_dados": True,
+        "total_clipp": total_clipp,
+        "total_os": total_os,
+        "total_sh": total_sh,
+        "tot_np": tot_np,
+        "tot_pix": tot_pix,
+        "tot_especie": tot_especie,
+        "tot_cartao": tot_cartao,
+        "total_periodo": r["total_periodo"] or 0.0
+    }
