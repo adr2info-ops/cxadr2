@@ -2,63 +2,65 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Caixa Diário - ADR2</title>
     <style>
         :root {
             --primary: #1e3a8a;
             --primary-light: #2563eb;
-            --bg: #f1f5f9;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #0f172a;
             --subtext: #475569;
             --success: #16a34a;
-            --border: #e2e8f0;
+            --border: #cbd5e1;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; }
 
-        /* Header */
-        header { background: var(--primary); color: white; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; }
+        /* Header Fixo */
+        header { background: var(--primary); color: white; padding: 12px 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+        header h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.5px; }
 
-        .container { max-width: 500px; margin: 0 auto; padding: 12px; }
+        /* Container ajustado para telas mobile */
+        .container { max-width: 420px; margin: 0 auto; padding: 10px; }
 
         /* Card da Data */
-        .card-date { background: var(--card-bg); padding: 12px 16px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .card-date label { font-weight: 600; font-size: 0.85rem; color: var(--subtext); }
-        .card-date input { border: 1px solid var(--border); background: #f8fafc; padding: 8px 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; color: var(--text); outline: none; }
+        .card-date { background: var(--card-bg); padding: 10px 14px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .card-date label { font-weight: 700; font-size: 0.8rem; color: var(--subtext); }
+        .card-date input { border: 1px solid var(--border); background: #f1f5f9; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; color: var(--text); outline: none; }
 
         /* Cards dos Programas */
-        .card { background: var(--card-bg); border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card-title { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
-        .card-title span.subtotal-badge { background: #eff6ff; color: var(--primary-light); font-size: 0.85rem; padding: 4px 8px; border-radius: 6px; font-weight: 700; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .card-title { font-size: 0.88rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; }
+        .card-title span.subtotal-badge { background: #eff6ff; color: var(--primary-light); font-size: 0.8rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* Grid compacto com 2 colunas */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .field { display: flex; flex-direction: column; }
-        .field label { font-size: 0.75rem; font-weight: 700; color: var(--subtext); margin-bottom: 4px; text-transform: uppercase; }
-        .field input { padding: 10px; border: 1px solid var(--border); background: #f8fafc; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: right; color: var(--text); outline: none; }
-        .field input:focus { border-color: var(--primary-light); background: #fff; }
+        .field label { font-size: 0.7rem; font-weight: 700; color: var(--subtext); margin-bottom: 3px; text-transform: uppercase; }
+        .field input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); background: #f8fafc; border-radius: 6px; font-size: 0.95rem; font-weight: 700; text-align: right; color: var(--text); outline: none; -webkit-appearance: none; }
+        .field input:focus { border-color: var(--primary-light); background: #fff; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
 
-        /* Card de Resumo das Formas de Pagamento */
-        .summary-card { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 16px; }
-        .summary-title { font-size: 0.8rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; margin-bottom: 8px; text-align: center; }
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: center; }
-        .summary-item { background: #fff; padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
-        .summary-item label { font-size: 0.7rem; color: var(--subtext); font-weight: 700; display: block; }
-        .summary-item span { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+        /* Resumo das Formas de Pagamento */
+        .summary-card { background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+        .summary-title { font-size: 0.75rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; margin-bottom: 6px; text-align: center; }
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; text-align: center; }
+        .summary-item { background: #fff; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border); }
+        .summary-item label { font-size: 0.65rem; color: var(--subtext); font-weight: 700; display: block; }
+        .summary-item span { font-size: 0.85rem; font-weight: 700; color: var(--text); }
 
-        /* Total Geral e Botão Fixo */
-        .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid var(--border); padding: 12px 16px; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); }
-        .footer-container { max-width: 500px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        /* Total Geral e Botão Fixo no Rodapé */
+        .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; border-top: 1px solid var(--border); padding: 10px 14px; box-shadow: 0 -3px 10px rgba(0,0,0,0.08); z-index: 100; }
+        .footer-container { max-width: 420px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         
         .total-display { display: flex; flex-direction: column; }
-        .total-display label { font-size: 0.7rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
-        .total-display span { font-size: 1.3rem; font-weight: 800; color: var(--success); }
+        .total-display label { font-size: 0.65rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
+        .total-display span { font-size: 1.2rem; font-weight: 800; color: var(--success); }
 
-        .btn-salvar { background: var(--success); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
-        .btn-salvar:active { opacity: 0.8; }
+        .btn-salvar { background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.2s; -webkit-tap-highlight-color: transparent; }
+        .btn-salvar:active { background: #15803d; }
     </style>
 </head>
 <body>
@@ -151,7 +153,6 @@
     }
 
     function calcular() {
-        // Subtotais Programas
         let clipp = getVal('clipp_np') + getVal('clipp_pix') + getVal('clipp_especie') + getVal('clipp_cartao');
         let os = getVal('os_np') + getVal('os_pix') + getVal('os_especie') + getVal('os_cartao');
         let sh = getVal('sh_np') + getVal('sh_pix') + getVal('sh_especie') + getVal('sh_cartao');
@@ -160,7 +161,6 @@
         document.getElementById('sub_os').innerText = fmt(os);
         document.getElementById('sub_sh').innerText = fmt(sh);
 
-        // Subtotais por Meio de Pagamento
         let totNp = getVal('clipp_np') + getVal('os_np') + getVal('sh_np');
         let totPix = getVal('clipp_pix') + getVal('os_pix') + getVal('sh_pix');
         let totEspecie = getVal('clipp_especie') + getVal('os_especie') + getVal('sh_especie');
@@ -171,7 +171,6 @@
         document.getElementById('tot_especie').innerText = fmt(totEspecie);
         document.getElementById('tot_cartao').innerText = fmt(totCartao);
 
-        // Total Geral
         let total = clipp + os + sh;
         document.getElementById('total_geral').innerText = fmt(total);
     }
